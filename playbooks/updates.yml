@@ -6,7 +6,7 @@
 
   tasks:
     - name: upgrade all packages
-      yum: name=* state=latest
+      yum: name=* state=latest exclude=mysql*
 
     - name: install own version of 'needs-restarting'
       copy: src=needs-restarting.py dest=/root/needs-restarting.py mode=0700
