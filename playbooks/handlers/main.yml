@@ -1,0 +1,8 @@
+---
+
+- name: Restart ssh
+  service: name=sshd state=restarted
+
+
+- name: waiting for server to come back after reboot
+  local_action: wait_for host={{ inventory_hostname }} state=started port=22 delay=10 timeout=60
