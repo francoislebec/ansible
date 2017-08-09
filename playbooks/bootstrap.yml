@@ -3,13 +3,7 @@
   become_method: sudo
   become_user: root
   gather_facts: yes
-  vars: # Hash512 created with: # python -c 'import crypt,getpass; print(crypt.crypt(getpass.getpass(), crypt.mksalt(crypt.METHOD_SHA512)))'
-    root_password: 'hash512 password'
-    anserv_password: 'hash512 password'
-    emailTo: receiver@domain
-    emailFrom: sender@domain
-    connectTo: domain
-    updateOption: minimal-security
+
 
   tasks:
     - name: Change root password
@@ -17,22 +11,27 @@
         name=root
         password={{ root_password }}
 
-    - name: Add user anserv
+    - name: Add my ansible user
       user:
-        name=anserv
-        password={{ anserv_password }}
-        state=present
+        name={{ user_name }}
+        password={{ user_pass }}
+        shell=/bin/bash
+        groups=wheel
+        append=yes 
 
-    - name: Add SSH public key to user anserv
-      authorized_key:
-        user=anserv
-        key="{{ lookup('file', "../files/anserv.pub") }}"
+
+    - name: Add my ansible user's public key to the remote server
+      authorized_key: 
+        user: "{{ user_name }}"
+        key: "{{ shared_publickey }}" 
+        state: present
+
 
     - name: Add anserv user to sudoers file
       lineinfile:
         dest: /etc/sudoers
         state: present
-        line: 'anserv ALL=(ALL) NOPASSWD: ALL'
+        line: '{{ user_name }} ALL=(ALL) NOPASSWD: ALL'
         insertafter: '# %wheel'
 
     - name: Disallow root SSH access
@@ -79,7 +78,7 @@
       tags: yum-cron
 
 
-  handlers:
-
-    - name: Restart ssh
-      service: name=sshd state=restarted
+#  handlers:
+#
+#    - name: Restart ssh
+#      service: name=sshd state=restarted
