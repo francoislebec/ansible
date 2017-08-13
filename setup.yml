@@ -1,0 +1,62 @@
+---
+- hosts: all
+  become: yes
+  become_method: sudo
+  become_user: root
+  gather_facts: no
+
+  vars:
+    user: 'bountyman'
+    password: 'rooflij69'
+
+
+
+Then in my bastion server role I want to create the admin user and generate a key pair at the same time (the registered variable will have the user's public key):
+- name: Create admin user with ssh key pair 
+user:
+name: myadmin
+generate_ssh_key: yes
+state: present
+register: myadmin
+
+In that same bastion role I want to install the public key to all of my web servers (this is where the delegate_to comes in)
+- name: Install myadmin public key on every web server
+authorized_key:
+user: myadmin
+key: "{{ myadmin.ssh_public_key }}"
+delegate_to: "{{ item }}"
+with_items: "{{ groups['webservers'] }}"
+
+
+
+
+  - name: Check if ansible user exists
+    command: getent passwd {{ user }}
+    register: ansible_user_exists
+    ignore_errors: yes
+
+  - name: Setup | create ansible user
+    user: name={{ user }}
+    generate_ssh_key: yes
+    state: present
+    when: user_exists.rc != 0
+    register: myadmin
+
+  - name: Setup | set password for ansible user
+    shell: usermod -p $(echo '{{ password }}' | openssl passwd -1 -stdin) {{ user }}
+    when: user_exists.rc != 0
+
+  - name: Setup | authorized key upload
+    authorized_key:
+      user={{ user }}
+      key="{{ lookup('file', 'mypublickey.pub') }}"
+      path='/home/{{ user }}/.ssh/authorized_keys'
+      manage_dir=yes
+
+
+  - name: Add anserv user to sudoers file
+    lineinfile:
+     dest: /etc/sudoers
+     state: present
+     line: '{{ user }} ALL=(ALL) NOPASSWD: ALL'
+     insertafter: '# %wheel'
