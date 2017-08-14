@@ -8,7 +8,7 @@
     - name: Change root password
       user:
         name=root
-        password={{ root_password }}
+        password='{{ root_password }}'
 
     - name: Add my ansible user
       user:
