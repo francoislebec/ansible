@@ -16,15 +16,14 @@
         name={{ ansible_user }}
         password={{ ansible_password }}
         state=present  
-      
-
+        
     - name: Add my ansible user's public key to the remote server
       authorized_key: 
-        user: "{{ ansible_user }}"
+        user: {{ ansible_user }}
         key: "{{ lookup('file', 'ansible_user.pub') }}"
         state: present
         manage_dir: yes
-      
+
 
     - name: Add anserv user to sudoers file
       lineinfile:
