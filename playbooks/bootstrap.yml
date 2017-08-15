@@ -44,7 +44,8 @@
         state: present
         line: '{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL'
         insertafter: '# %wheel'
-
+      when: ansible_user_exists.rc != 0
+      
     - name: Disallow root SSH access
       lineinfile: dest=/etc/ssh/sshd_config
                    regexp="^PermitRootLogin"
