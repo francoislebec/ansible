@@ -26,14 +26,15 @@
         password={{ ansible_password }}
         shell=/bin/bash
         groups=wheel
-        append=yes 
+        append=yes
       when: ansible_user_exists.rc != 0
 
     - name: Add my ansible user's public key to the remote server
       authorized_key: 
         user: {{ ansible_user }}
-        key: "{{ lookup('file', "../files/ansible_user.pub") }}"
+        key: "{{ lookup('file', "../files/ansible_user.pub") }}
         state: present
+        manage_dir: yes
         delegate_to: "{{ item }}"
         with_items: "{{ groups['servers'] }}"
       when: ansible_user_exists.rc != 0
@@ -45,7 +46,7 @@
         line: '{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL'
         insertafter: '# %wheel'
       when: ansible_user_exists.rc != 0
-      
+
     - name: Disallow root SSH access
       lineinfile: dest=/etc/ssh/sshd_config
                    regexp="^PermitRootLogin"
