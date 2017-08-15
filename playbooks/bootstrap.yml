@@ -11,19 +11,12 @@
 
   tasks:
 
-    - name: Check if ansible user already exists
-      command: getent passwd {{ ansible_user }}
-      register: ansible_user_exists
-      ignore_errors: yes
-
     - name: Add my ansible user
       user:
         name="{{ ansible_user }}"
         password="{{ ansible_password }}"
-        shell=/bin/bash
-        groups=wheel
-        append=yes
-      when: ansible_user_exists.rc != 0
+        state=present  
+      
 
     - name: Add my ansible user's public key to the remote server
       authorized_key: 
@@ -33,7 +26,7 @@
         manage_dir: yes
         delegate_to: "{{ item }}"
         with_items: "{{ groups['servers'] }}"
-      when: ansible_user_exists.rc != 0
+      
 
     - name: Add anserv user to sudoers file
       lineinfile:
@@ -41,8 +34,7 @@
         state: present
         line: '{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL'
         insertafter: '# %wheel'
-      when: ansible_user_exists.rc != 0
-
+      
     - name: Disallow root SSH access
       lineinfile: dest=/etc/ssh/sshd_config
                    regexp="^PermitRootLogin"
