@@ -15,6 +15,11 @@
         name=root
         password={{ root_password }}
 
+    - name: Check if ansible user already exists
+      command: getent passwd {{ ansible_user }}
+      register: ansible_user_exists
+      ignore_errors: yes
+
     - name: Add my ansible user
       user:
         name={{ ansible_user }}
@@ -22,14 +27,16 @@
         shell=/bin/bash
         groups=wheel
         append=yes 
-
+      when: ansible_user_exists.rc != 0
 
     - name: Add my ansible user's public key to the remote server
       authorized_key: 
-        user: ansible
-        key: "{{ shared_publickey }}" 
+        user: {{ ansible_user }}
+        key: "{{ lookup('file', "../files/ansible_user.pub") }}"
         state: present
-
+        delegate_to: "{{ item }}"
+        with_items: "{{ groups['servers'] }}"
+      when: ansible_user_exists.rc != 0
 
     - name: Add anserv user to sudoers file
       lineinfile:
