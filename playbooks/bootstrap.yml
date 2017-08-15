@@ -22,8 +22,8 @@
 
     - name: Add my ansible user
       user:
-        name={{ ansible_user }}
-        password={{ ansible_password }}
+        name="{{ ansible_user }}"
+        password="{{ ansible_password }}"
         shell=/bin/bash
         groups=wheel
         append=yes
