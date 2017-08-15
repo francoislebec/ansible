@@ -32,7 +32,7 @@
     - name: Add my ansible user's public key to the remote server
       authorized_key: 
         user: {{ ansible_user }}
-        key: "{{ lookup('file', "../files/ansible_user.pub") }}
+        key="{{ lookup('file', 'ansible_user.pub') }}"
         state: present
         manage_dir: yes
         delegate_to: "{{ item }}"
