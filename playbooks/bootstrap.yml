@@ -24,8 +24,6 @@
         key: "{{ lookup('file', 'ansible_user.pub') }}"
         state: present
         manage_dir: yes
-        delegate_to: "{{ item }}"
-        with_items: "{{ groups['servers'] }}"
       
 
     - name: Add anserv user to sudoers file
