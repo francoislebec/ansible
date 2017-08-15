@@ -24,7 +24,6 @@
         state: present
         manage_dir: yes
 
-
     - name: Add anserv user to sudoers file
       lineinfile:
         dest: /etc/sudoers
@@ -37,7 +36,7 @@
                    regexp="^PermitRootLogin"
                    line="PermitRootLogin no"
                    state=present
-      notify: Restart ssh
+      notify: restart ssh
 
 
     - name: Disallow SSH password authentication
@@ -45,14 +44,14 @@
                   regexp="^PasswordAuthentication"
                   line="PasswordAuthentication no"
                   state=present
-      notify: Restart ssh
+      notify: restart ssh
 
     - name: Disallow SSH GSS API authentication
       lineinfile: dest=/etc/ssh/sshd_config
                   regexp="^GSSAPIAuthentication"
                   line="GSSAPIAuthentication no"
                   state=present
-      notify: Restart ssh
+      notify: restart ssh
 
 
     - name: install cronie package
