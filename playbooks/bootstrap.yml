@@ -8,7 +8,8 @@
     ansible_user: ansible
     ansible_password: '$6$HknTiJsj26WbpOz1$MKG7Dss/e56whMwCXpwWVgtaRa/WV.KAu906icYKFToY.BCgpd/6WpeAoeQTf/yJYnlsHxVZsHJd5QEGdy6uy0'
     shared_publickey: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCg1vhiQsVOpZRF7yfDXd6xHTSFlk87GZWHRsC0kOz8w75O3wrpvYoxaR8f82SphlkbkKo7Ccr/DaTGxxQzxuyX+hzBp377whSm/hkEpZfp/8s8eMXyWWJyDh9cOYy5c59aI2Z8qb0yTfbgc2StILF/3j5dh6P3GybG2oz++u+aSqeARNlLfccSwV0A+7NA5ZVP/rto6611izn/S4VB+GeX0MvlNRcEFrbm8vMlf30cmj1gvRymqZDXEgnL81jdaQn+FMWQFUP1aQC6Hp1aSxZABCsMT6XP6keCz3ph7KCkkJKNWqxwdezFx2MYQtyQqClIgfnry/mhBW/kYcgWGTWZansible@fed26.rhlab.net'
-
+    updateOption: minimal-security
+    
   tasks:
 
     - name: Add my ansible user
