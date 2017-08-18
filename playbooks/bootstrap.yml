@@ -2,44 +2,42 @@
   become: yes
   become_method: sudo
   become_user: root
-  gather_facts: yes
-
-
+  gather_facts: no
+  vars: # Hash512 created with: # python -c 'import crypt,getpass; print(crypt.crypt(getpass.getpass(), crypt.mksalt(crypt.METHOD_SHA512)))'
+    root_password: '$6$sZwtWE3MhAvBUr.V$u60eTalzbW0Uepc1x1.8dTXbva0AXpnFEG/CcvtSTPs5hFIBJiOVLQ8T6MUYXkHsKNpov5uLfJSdiy9rWGWgm.'
+    ansible_user: ansible
+    ansible_password: '$6$HknTiJsj26WbpOz1$MKG7Dss/e56whMwCXpwWVgtaRa/WV.KAu906icYKFToY.BCgpd/6WpeAoeQTf/yJYnlsHxVZsHJd5QEGdy6uy0'
+    shared_publickey: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCg1vhiQsVOpZRF7yfDXd6xHTSFlk87GZWHRsC0kOz8w75O3wrpvYoxaR8f82SphlkbkKo7Ccr/DaTGxxQzxuyX+hzBp377whSm/hkEpZfp/8s8eMXyWWJyDh9cOYy5c59aI2Z8qb0yTfbgc2StILF/3j5dh6P3GybG2oz++u+aSqeARNlLfccSwV0A+7NA5ZVP/rto6611izn/S4VB+GeX0MvlNRcEFrbm8vMlf30cmj1gvRymqZDXEgnL81jdaQn+FMWQFUP1aQC6Hp1aSxZABCsMT6XP6keCz3ph7KCkkJKNWqxwdezFx2MYQtyQqClIgfnry/mhBW/kYcgWGTWZansible@fed26.rhlab.net'
+    updateOption: minimal-security
+    
   tasks:
-    - name: Change root password
-      user:
-        name=root
-        password={{ root_password }}
 
     - name: Add my ansible user
       user:
-        name={{ user_name }}
-        password={{ user_pass }}
-        shell=/bin/bash
-        groups=wheel
-        append=yes 
-
-
+        name={{ ansible_user }}
+        password={{ ansible_password }}
+        state=present  
+        
     - name: Add my ansible user's public key to the remote server
       authorized_key: 
-        user: "{{ user_name }}"
-        key: "{{ shared_publickey }}" 
+        user: "{{ ansible_user }}"
+        key: "{{ lookup('file', 'ansible_user.pub') }}"
         state: present
-
+        manage_dir: yes
 
     - name: Add anserv user to sudoers file
       lineinfile:
         dest: /etc/sudoers
         state: present
-        line: '{{ user_name }} ALL=(ALL) NOPASSWD: ALL'
+        line: '{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL'
         insertafter: '# %wheel'
-
+      
     - name: Disallow root SSH access
       lineinfile: dest=/etc/ssh/sshd_config
                    regexp="^PermitRootLogin"
                    line="PermitRootLogin no"
                    state=present
-      notify: Restart ssh
+      notify: restart ssh
 
 
     - name: Disallow SSH password authentication
@@ -47,14 +45,14 @@
                   regexp="^PasswordAuthentication"
                   line="PasswordAuthentication no"
                   state=present
-      notify: Restart ssh
+      notify: restart ssh
 
     - name: Disallow SSH GSS API authentication
       lineinfile: dest=/etc/ssh/sshd_config
                   regexp="^GSSAPIAuthentication"
                   line="GSSAPIAuthentication no"
                   state=present
-      notify: Restart ssh
+      notify: restart ssh
 
 
     - name: install cronie package
@@ -76,9 +74,3 @@
     - name: enable yum-cron service
       service: name=yum-cron state=started enabled=yes
       tags: yum-cron
-
-
-#  handlers:
-#
-#    - name: Restart ssh
-#      service: name=sshd state=restarted
