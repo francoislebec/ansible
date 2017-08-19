@@ -1,7 +1,7 @@
 - hosts: all
   become: yes
   become_method: sudo
-  become_user: ansible
+  become_user: root
   gather_facts: no
   vars: # Hash512 created with: # python -c 'import crypt,getpass; print(crypt.crypt(getpass.getpass(), crypt.mksalt(crypt.METHOD_SHA512)))'
     root_password: '$6$sZwtWE3MhAvBUr.V$u60eTalzbW0Uepc1x1.8dTXbva0AXpnFEG/CcvtSTPs5hFIBJiOVLQ8T6MUYXkHsKNpov5uLfJSdiy9rWGWgm.'
