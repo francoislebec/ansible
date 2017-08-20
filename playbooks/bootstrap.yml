@@ -1,7 +1,8 @@
+--- # Bootstrap servers
 - hosts: all
   become: yes
   become_method: sudo
-  become_user: ansible
+  become_user: {{ ansible_user }}
   connection: ssh
   gather_facts: no
   vars: # Hash512 created with: # python -c 'import crypt,getpass; print(crypt.crypt(getpass.getpass(), crypt.mksalt(crypt.METHOD_SHA512)))'
