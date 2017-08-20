@@ -1,8 +1,10 @@
+--- # Update CentOS servers
 - hosts: all
   become: yes
   become_method: sudo
-  become_user: ansible
-  gather_facts: yes
+  become_user: ansible_user
+  connection: ssh
+  gather_facts: no
 
   tasks:
     - name: upgrade all packages
